@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ekonomi Dasar — Penawaran & Permintaan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a28;
+    --border: #2a2a3d;
+    --accent: #f5c842;
+    --accent2: #e85d4a;
+    --accent3: #4ab8e8;
+    --text: #f0eff5;
+    --muted: #8888a8;
+    --success: #4ae8a0;
+    --error: #e84a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.7;
+  }
+
+  /* ---- NOISE OVERLAY ---- */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.5;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+
+  /* ---- HERO ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,200,66,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(74,184,232,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(232,93,74,0.06) 0%, transparent 50%);
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: rgba(245,200,66,0.12);
+    border: 1px solid rgba(245,200,66,0.3);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.4rem 1.2rem;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    animation: fadeUp 0.9s ease 0.1s both;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    max-width: 540px;
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    animation: fadeUp 0.9s ease 0.2s both;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeUp 0.9s ease 0.3s both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    padding: 0.9rem 2.4rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(245,200,66,0.3);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.9rem 2.4rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+    display: inline-block;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ---- SCROLL INDICATOR ---- */
+  .scroll-ind {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: bounce 2s ease infinite;
+  }
+
+  .scroll-ind span { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--muted), transparent); }
+
+  /* ---- SECTIONS ---- */
+  section { padding: 6rem 2rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    max-width: 600px;
+    font-size: 1.05rem;
+    margin-bottom: 3rem;
+  }
+
+  /* ---- CONCEPT CARDS ---- */
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .concept-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s;
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--accent));
+  }
+
+  .concept-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245,200,66,0.3);
+  }
+
+  .concept-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .concept-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .concept-card p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  /* ---- INFO BOX ---- */
+  .info-box {
+    background: rgba(245,200,66,0.06);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin: 1.5rem 0;
+  }
+
+  .info-box h4 {
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+  }
+
+  .info-box ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .info-box li::before {
+    content: '→ ';
+    color: var(--accent);
+  }
+
+  .info-box li { font-size: 0.95rem; color: var(--text); }
+
+  /* ---- CURVE DIAGRAM ---- */
+  .diagram-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .diagram-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .diagram-grid { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+  }
+
+  .curve-svg {
+    width: 100%;
+    border-radius: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1rem;
+  }
+
+  /* ---- FAKTOR CARDS ---- */
+  .faktor-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .faktor-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+
+  .faktor-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(74,184,232,0.4);
+  }
+
+  .faktor-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent3);
+    margin-bottom: 0.6rem;
+  }
+
+  .faktor-card h4 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .faktor-card p { color: var(--muted); font-size: 0.875rem; }
+
+  /* ---- HUKUM CARDS ---- */
+  .law-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+  }
+
+  .law-icon {
+    font-size: 3rem;
+    flex-shrink: 0;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245,200,66,0.08);
+    border-radius: 12px;
+  }
+
+  .law-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .law-content p { color: var(--muted); line-height: 1.7; }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border-radius: 100px;
+    margin-bottom: 0.8rem;
+  }
+
+  .badge-demand { background: rgba(232,93,74,0.15); color: var(--accent2); }
+  .badge-supply { background: rgba(74,184,232,0.15); color: var(--accent3); }
+
+  /* ---- EQUILIBRIUM VIS ---- */
+  .eq-visual {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  /* ---- TABLE ---- */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: var(--card);
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(245,200,66,0.03); }
+
+  .trend-up { color: var(--success); font-weight: 500; }
+  .trend-down { color: var(--accent2); font-weight: 500; }
+
+  /* ---- INTERACTIVE SIMULATOR ---- */
+  .simulator {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin: 2rem 0;
+  }
+
+  .simulator h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .simulator-desc { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+  .slider-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .slider-value {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(245,200,66,0.4);
+  }
+
+  .sim-result {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .sim-metric label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .sim-metric span {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  /* ---- QUIZ ---- */
+  .quiz-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .quiz-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .quiz-header {
+    background: linear-gradient(135deg, rgba(245,200,66,0.1), rgba(74,184,232,0.05));
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .quiz-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+  }
+
+  .quiz-progress-bar {
+    width: 200px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .quiz-body { padding: 2.5rem; }
+
+  .question-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    letter-spacing: 0.08em;
+  }
+
+  .question-text {
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 2rem;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .option-btn .opt-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .option-btn:hover:not(.answered) {
+    border-color: var(--accent);
+    background: rgba(245,200,66,0.05);
+  }
+
+  .option-btn:hover:not(.answered) .opt-letter {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .option-btn.correct {
+    border-color: var(--success);
+    background: rgba(74,232,160,0.08);
+    pointer-events: none;
+  }
+
+  .option-btn.correct .opt-letter {
+    border-color: var(--success);
+    color: var(--success);
+    background: rgba(74,232,160,0.15);
+  }
+
+  .option-btn.wrong {
+    border-color: var(--error);
+    background: rgba(232,74,74,0.08);
+    pointer-events: none;
+  }
+
+  .option-btn.wrong .opt-letter {
+    border-color: var(--error);
+    color: var(--error);
+    background: rgba(232,74,74,0.15);
+  }
+
+  .option-btn.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .quiz-feedback {
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: none;
+    border-left: 3px solid var(--success);
+    font-size: 0.95rem;
+  }
+
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.wrong-fb { border-left-color: var(--error); }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .quiz-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .quiz-score span {
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  /* ---- RESULT SCREEN ---- */
+  .result-screen {
+    text-align: center;
+    padding: 4rem 2.5rem;
+    display: none;
+  }
+
+  .result-screen.show { display: block; }
+
+  .result-emoji { font-size: 5rem; margin-bottom: 1.5rem; }
+
+  .result-score-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-label { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; }
+
+  .result-breakdown {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+
+  .res-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 2rem;
+    min-width: 130px;
+  }
+
+  .res-stat .val {
+    font-family: 'DM Mono', monospace;
+    font-size: 2rem;
+    font-weight: 500;
+    display: block;
+  }
+
+  .res-stat .lbl { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; display: block; }
+
+  .val-correct { color: var(--success); }
+  .val-wrong { color: var(--error); }
+
+  /* ---- ANIMATIONS ---- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  footer strong { color: var(--accent); }
+
+  /* ---- DIVIDER ---- */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 3rem 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Eko·Dasar</div>
+  <ul class="nav-links">
+    <li><a href="#penawaran">Penawaran</a></li>
+    <li><a href="#permintaan">Permintaan</a></li>
+    <li><a href="#keseimbangan">Keseimbangan</a></li>
+    <li><a href="#simulator">Simulator</a></li>
+    <li><a href="#kuis">Kuis</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-tag">📊 Materi Ekonomi Dasar</div>
+  <h1>Penawaran<br>& <em>Permintaan</em></h1>
+  <p class="hero-sub">Pelajari konsep fundamental ekonomi yang menentukan harga dan kuantitas di pasar — lengkap dengan visualisasi, contoh nyata, dan kuis interaktif.</p>
+  <div class="hero-cta">
+    <a href="#penawaran" class="btn-primary">Mulai Belajar →</a>
+    <a href="#kuis" class="btn-outline">Langsung ke Kuis</a>
+  </div>
+  <div class="scroll-ind">
+    Gulir ke bawah
+    <span></span>
+  </div>
+</section>
+
+<!-- PENGANTAR -->
+<section id="pengantar">
+  <div class="container">
+    <div class="section-label">Pengantar</div>
+    <h2 class="section-title">Mengapa Ini Penting?</h2>
+    <p class="section-desc">Permintaan dan penawaran adalah dua kekuatan utama yang menggerakkan pasar. Mereka menentukan berapa harga suatu barang dan berapa banyak yang diproduksi.</p>
+
+    <div class="concept-grid">
+      <div class="concept-card fade-in" style="--card-accent: var(--accent3)">
+        <div class="icon">📈</div>
+        <h3>Penawaran</h3>
+        <p>Jumlah barang atau jasa yang <strong>ingin dan mampu dijual</strong> produsen pada berbagai tingkat harga dalam periode tertentu.</p>
+      </div>
+      <div class="concept-card fade-in" style="--card-accent: var(--accent2)">
+        <div class="icon">📉</div>
+        <h3>Permintaan</h3>
+        <p>Jumlah barang atau jasa yang <strong>ingin dan mampu dibeli</strong> konsumen pada berbagai tingkat harga dalam periode tertentu.</p>
+      </div>
+      <div class="concept-card fade-in" style="--card-accent: var(--success)">
+        <div class="icon">⚖️</div>
+        <h3>Keseimbangan Pasar</h3>
+        <p>Titik di mana <strong>jumlah yang diminta sama dengan jumlah yang ditawarkan</strong>, menghasilkan harga dan kuantitas keseimbangan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PENAWARAN -->
+<section id="penawaran" class="diagram-section">
+  <div class="container">
+    <div class="section-label">Bagian 01</div>
+    <h2 class="section-title">Penawaran <em style="font-style:italic;color:var(--accent3)">(Supply)</em></h2>
+
+    <div class="diagram-grid">
+      <div class="fade-in">
+        <svg class="curve-svg" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4ab8e8" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="#4ab8e8" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid -->
+          <line x1="50" y1="20" x2="50" y2="260" stroke="#2a2a3d" stroke-width="1"/>
+          <line x1="50" y1="260" x2="360" y2="260" stroke="#2a2a3d" stroke-width="1"/>
+          <line x1="50" y1="80" x2="360" y2="80" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="50" y1="140" x2="360" y2="140" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="50" y1="200" x2="360" y2="200" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="140" y1="260" x2="140" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="230" y1="260" x2="230" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="320" y1="260" x2="320" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <!-- Supply Curve -->
+          <path d="M 60 250 Q 200 160 340 40" stroke="url(#sGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- Labels -->
+          <text x="35" y="265" fill="#8888a8" font-size="10" font-family="DM Mono">0</text>
+          <text x="30" y="265" fill="#f0eff5" font-size="11" font-family="DM Mono" transform="rotate(-90,30,200)">Harga (P)</text>
+          <text x="180" y="285" fill="#f0eff5" font-size="11" font-family="DM Mono">Kuantitas (Q)</text>
+          <text x="290" y="52" fill="#4ab8e8" font-size="13" font-family="Playfair Display" font-weight="700">S (Supply)</text>
+          <text x="34" y="83" fill="#8888a8" font-size="9" font-family="DM Mono">P3</text>
+          <text x="34" y="143" fill="#8888a8" font-size="9" font-family="DM Mono">P2</text>
+          <text x="34" y="203" fill="#8888a8" font-size="9" font-family="DM Mono">P1</text>
+          <text x="134" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q1</text>
+          <text x="224" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q2</text>
+          <text x="314" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q3</text>
+          <text x="62" y="115" fill="#4ab8e8" font-size="9" font-family="DM Sans">↑ Harga naik</text>
+          <text x="62" y="128" fill="#4ab8e8" font-size="9" font-family="DM Sans">↑ Q meningkat</text>
+          <text x="50" y="17" fill="#8888a8" font-size="10" font-family="DM Mono" letter-spacing="2">KURVA PENAWARAN</text>
+        </svg>
+      </div>
+
+      <div class="fade-in">
+        <p style="color:var(--muted);margin-bottom:1.5rem;">Penawaran menggambarkan perilaku produsen dalam menjual barang. Semakin tinggi harga, semakin besar insentif untuk memproduksi lebih banyak.</p>
+
+        <div class="law-box" style="background:rgba(74,184,232,0.05);border-color:rgba(74,184,232,0.2);">
+          <div class="law-icon">⚖️</div>
+          <div class="law-content">
+            <div class="badge badge-supply">Hukum Penawaran</div>
+            <h3>Hubungan Searah</h3>
+            <p>Jika harga suatu barang <strong>naik</strong>, maka jumlah yang ditawarkan akan <strong>naik</strong> pula, dan sebaliknya — dengan asumsi <em>ceteris paribus</em>.</p>
+          </div>
+        </div>
+
+        <div class="info-box" style="background:rgba(74,184,232,0.06);border-color:rgba(74,184,232,0.2);">
+          <h4 style="color:var(--accent3)">Faktor Penggeser Kurva Penawaran</h4>
+          <ul>
+            <li>Biaya produksi (bahan baku, tenaga kerja)</li>
+            <li>Teknologi produksi yang digunakan</li>
+            <li>Harga barang lain yang berkaitan</li>
+            <li>Ekspektasi produsen tentang harga</li>
+            <li>Jumlah produsen/penjual di pasar</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faktor Penawaran -->
+    <hr class="divider">
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:0.5rem;" class="fade-in">Faktor-Faktor yang Mempengaruhi Penawaran</h3>
+    <p style="color:var(--muted);margin-bottom:1.5rem;" class="fade-in">Selain harga, ada beberapa faktor yang dapat menggeser kurva penawaran:</p>
+
+    <div class="faktor-grid">
+      <div class="faktor-card fade-in">
+        <div class="faktor-num">01 / TEKNOLOGI</div>
+        <h4>Kemajuan Teknologi</h4>
+        <p>Teknologi baru yang efisien menurunkan biaya produksi, sehingga penawaran meningkat pada harga yang sama.</p>
+      </div>
+      <div class="faktor-card fade-in">
+        <div class="faktor-num">02 / BIAYA</div>
+        <h4>Biaya Produksi</h4>
+        <p>Kenaikan harga BBM atau upah minimum dapat mengurangi penawaran karena biaya produksi meningkat.</p>
+      </div>
+      <div class="faktor-card fade-in">
+        <div class="faktor-num">03 / PRODUSEN</div>
+        <h4>Jumlah Produsen</h4>
+        <p>Semakin banyak produsen yang masuk ke pasar, total penawaran akan meningkat secara keseluruhan.</p>
+      </div>
+      <div class="faktor-card fade-in">
+        <div class="faktor-num">04 / ALAM</div>
+        <h4>Kondisi Alam</h4>
+        <p>Untuk sektor pertanian, cuaca buruk atau bencana alam dapat menurunkan kapasitas produksi secara drastis.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERMINTAAN -->
+<section id="permintaan">
+  <div class="container">
+    <div class="section-label">Bagian 02</div>
+    <h2 class="section-title">Permintaan <em style="font-style:italic;color:var(--accent2)">(Demand)</em></h2>
+
+    <div class="diagram-grid">
+      <div class="fade-in">
+        <p style="color:var(--muted);margin-bottom:1.5rem;">Permintaan menggambarkan perilaku konsumen dalam membeli barang. Semakin tinggi harga, semakin sedikit yang ingin dibeli — inilah inti <strong>Hukum Permintaan</strong>.</p>
+
+        <div class="law-box" style="background:rgba(232,93,74,0.05);border-color:rgba(232,93,74,0.2);">
+          <div class="law-icon">⚖️</div>
+          <div class="law-content">
+            <div class="badge badge-demand">Hukum Permintaan</div>
+            <h3>Hubungan Terbalik</h3>
+            <p>Jika harga suatu barang <strong>naik</strong>, maka jumlah yang diminta akan <strong>turun</strong>, dan sebaliknya — dengan asumsi <em>ceteris paribus</em> (faktor lain tetap).</p>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h4>Faktor Penggeser Kurva Permintaan</h4>
+          <ul>
+            <li>Pendapatan konsumen berubah</li>
+            <li>Harga barang substitusi atau komplementer</li>
+            <li>Selera dan preferensi konsumen</li>
+            <li>Ekspektasi harga masa depan</li>
+            <li>Jumlah pembeli di pasar</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fade-in">
+        <svg class="curve-svg" viewBox="0 0 380 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#e85d4a" stop-opacity="0.8"/>
+              <stop offset="100%" stop-color="#e85d4a" stop-opacity="0.3"/>
+            </linearGradient>
+          </defs>
+          <!-- Grid -->
+          <line x1="50" y1="20" x2="50" y2="260" stroke="#2a2a3d" stroke-width="1"/>
+          <line x1="50" y1="260" x2="360" y2="260" stroke="#2a2a3d" stroke-width="1"/>
+          <!-- Grid lines -->
+          <line x1="50" y1="80" x2="360" y2="80" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="50" y1="140" x2="360" y2="140" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="50" y1="200" x2="360" y2="200" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="140" y1="260" x2="140" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="230" y1="260" x2="230" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <line x1="320" y1="260" x2="320" y2="20" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+          <!-- Demand Curve -->
+          <path d="M 60 40 Q 200 120 340 250" stroke="url(#dGrad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- Labels -->
+          <text x="35" y="265" fill="#8888a8" font-size="10" font-family="DM Mono">0</text>
+          <text x="30" y="265" fill="#f0eff5" font-size="11" font-family="DM Mono" transform="rotate(-90,30,200)">Harga (P)</text>
+          <text x="180" y="285" fill="#f0eff5" font-size="11" font-family="DM Mono">Kuantitas (Q)</text>
+          <text x="120" y="38" fill="#e85d4a" font-size="13" font-family="Playfair Display" font-weight="700">D (Demand)</text>
+          <!-- Y labels -->
+          <text x="34" y="83" fill="#8888a8" font-size="9" font-family="DM Mono">P3</text>
+          <text x="34" y="143" fill="#8888a8" font-size="9" font-family="DM Mono">P2</text>
+          <text x="34" y="203" fill="#8888a8" font-size="9" font-family="DM Mono">P1</text>
+          <!-- X labels -->
+          <text x="134" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q1</text>
+          <text x="224" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q2</text>
+          <text x="314" y="275" fill="#8888a8" font-size="9" font-family="DM Mono">Q3</text>
+          <!-- Arrow annotation -->
+          <text x="280" y="90" fill="#e85d4a" font-size="9" font-family="DM Sans">↑ Harga naik</text>
+          <text x="280" y="103" fill="#e85d4a" font-size="9" font-family="DM Sans">↓ Q berkurang</text>
+          <!-- Title -->
+          <text x="50" y="17" fill="#8888a8" font-size="10" font-family="DM Mono" letter-spacing="2">KURVA PERMINTAAN</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Tabel Permintaan -->
+    <hr class="divider">
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:1rem;" class="fade-in">Contoh Daftar Permintaan — Pasar Beras</h3>
+    <p style="color:var(--muted);margin-bottom:1.5rem;" class="fade-in">Berikut ilustrasi bagaimana jumlah yang diminta berubah seiring perubahan harga:</p>
+
+    <div class="table-wrap fade-in">
+      <table>
+        <thead>
+          <tr>
+            <th>Harga (Rp/kg)</th>
+            <th>Jumlah Diminta (kg)</th>
+            <th>Perubahan</th>
+            <th>Kesimpulan</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Rp 8.000</td><td>500</td><td class="trend-up">↑ Sangat Banyak</td><td>Harga murah, banyak yang mau beli</td></tr>
+          <tr><td>Rp 10.000</td><td>400</td><td class="trend-up">↑ Banyak</td><td>Masih terjangkau</td></tr>
+          <tr><td>Rp 12.000</td><td>300</td><td>— Sedang</td><td>Mulai dipertimbangkan</td></tr>
+          <tr><td>Rp 14.000</td><td>200</td><td class="trend-down">↓ Sedikit</td><td>Mulai beralih ke alternatif</td></tr>
+          <tr><td>Rp 16.000</td><td>100</td><td class="trend-down">↓ Sangat Sedikit</td><td>Harga terlalu mahal</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- KESEIMBANGAN -->
+<section id="keseimbangan" class="diagram-section">
+  <div class="container">
+    <div class="section-label">Bagian 03</div>
+    <h2 class="section-title">Keseimbangan <em style="font-style:italic;color:var(--success)">Pasar</em></h2>
+    <p class="section-desc">Ketika kurva permintaan dan penawaran bertemu, terjadilah titik keseimbangan — <strong>harga dan kuantitas yang disepakati pasar secara alami</strong>.</p>
+
+    <div class="eq-visual fade-in">
+      <svg viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg" style="max-width:600px;margin:0 auto;display:block;">
+        <!-- Grid -->
+        <line x1="60" y1="20" x2="60" y2="280" stroke="#2a2a3d" stroke-width="1.5"/>
+        <line x1="60" y1="280" x2="460" y2="280" stroke="#2a2a3d" stroke-width="1.5"/>
+        <!-- Grid dashes -->
+        <line x1="60" y1="100" x2="460" y2="100" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="60" y1="180" x2="460" y2="180" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="200" y1="20" x2="200" y2="280" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+        <line x1="340" y1="20" x2="340" y2="280" stroke="#2a2a3d" stroke-width="0.5" stroke-dasharray="4,4"/>
+
+        <!-- Demand curve: dari kiri atas → kanan bawah -->
+        <path d="M 70 40 Q 250 140 440 270" stroke="#e85d4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- Supply curve: dari kiri bawah → kanan atas -->
+        <path d="M 70 270 Q 250 170 440 40" stroke="#4ab8e8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+        <!-- Equilibrium point -->
+        <circle cx="255" cy="155" r="8" fill="#4ae8a0" opacity="0.9"/>
+        <circle cx="255" cy="155" r="14" fill="none" stroke="#4ae8a0" stroke-width="2" opacity="0.4"/>
+        <circle cx="255" cy="155" r="20" fill="none" stroke="#4ae8a0" stroke-width="1" opacity="0.2"/>
+
+        <!-- Dashed lines to axes -->
+        <line x1="60" y1="155" x2="255" y2="155" stroke="#4ae8a0" stroke-width="1" stroke-dasharray="5,5" opacity="0.7"/>
+        <line x1="255" y1="155" x2="255" y2="280" stroke="#4ae8a0" stroke-width="1" stroke-dasharray="5,5" opacity="0.7"/>
+
+        <!-- Labels -->
+        <text x="44" y="158" fill="#4ae8a0" font-size="9" font-family="DM Mono">P*</text>
+        <text x="249" y="295" fill="#4ae8a0" font-size="9" font-family="DM Mono">Q*</text>
+
+        <!-- Curve labels -->
+        <text x="390" y="55" fill="#4ab8e8" font-size="13" font-family="Playfair Display" font-weight="700">S</text>
+        <text x="390" y="265" fill="#e85d4a" font-size="13" font-family="Playfair Display" font-weight="700">D</text>
+
+        <!-- Equilibrium annotation -->
+        <rect x="270" y="128" width="130" height="36" rx="6" fill="#1a1a28" stroke="#4ae8a0" stroke-width="1" opacity="0.9"/>
+        <text x="278" y="143" fill="#4ae8a0" font-size="9" font-family="DM Sans" font-weight="600">Titik Keseimbangan</text>
+        <text x="278" y="157" fill="#8888a8" font-size="8" font-family="DM Mono">Qd = Qs</text>
+
+        <!-- Title -->
+        <text x="60" y="15" fill="#8888a8" font-size="10" font-family="DM Mono" letter-spacing="2">KESEIMBANGAN PASAR</text>
+
+        <!-- Axis labels -->
+        <text x="35" y="155" fill="#f0eff5" font-size="10" font-family="DM Mono" transform="rotate(-90,35,155)">Harga (P)</text>
+        <text x="240" y="312" fill="#f0eff5" font-size="10" font-family="DM Mono">Kuantitas (Q)</text>
+
+        <!-- Surplus / Shortage annotations -->
+        <text x="68" y="92" fill="#e85d4a" font-size="8" font-family="DM Sans">SURPLUS</text>
+        <text x="68" y="102" fill="#8888a8" font-size="7" font-family="DM Sans">(Harga di atas P*)</text>
+        <text x="68" y="240" fill="#4ab8e8" font-size="8" font-family="DM Sans">SHORTAGE</text>
+        <text x="68" y="250" fill="#8888a8" font-size="7" font-family="DM Sans">(Harga di bawah P*)</text>
+      </svg>
+    </div>
+
+    <div class="concept-grid" style="margin-top:2rem;">
+      <div class="concept-card fade-in" style="--card-accent:var(--accent2)">
+        <div class="icon">📦</div>
+        <h3>Surplus (Kelebihan)</h3>
+        <p>Terjadi saat harga <strong>di atas</strong> harga keseimbangan. Jumlah yang ditawarkan melebihi jumlah yang diminta. Produsen akan menurunkan harga untuk menghabiskan stok.</p>
+      </div>
+      <div class="concept-card fade-in" style="--card-accent:var(--accent3)">
+        <div class="icon">🛒</div>
+        <h3>Shortage (Kekurangan)</h3>
+        <p>Terjadi saat harga <strong>di bawah</strong> harga keseimbangan. Jumlah yang diminta melebihi jumlah yang ditawarkan. Harga akan naik secara alami menuju keseimbangan.</p>
+      </div>
+      <div class="concept-card fade-in" style="--card-accent:var(--success)">
+        <div class="icon">✅</div>
+        <h3>Keseimbangan (Equilibrium)</h3>
+        <p>Pada titik ini, <strong>Qd = Qs</strong>. Tidak ada tekanan untuk mengubah harga. Pasar bersih — semua yang ditawarkan terjual, semua yang ingin beli dapat membeli.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATOR -->
+<section id="simulator">
+  <div class="container">
+    <div class="section-label">Coba Sendiri</div>
+    <h2 class="section-title">Simulator <em style="font-style:italic;color:var(--accent)">Pasar</em></h2>
+    <p class="section-desc">Geser slider untuk melihat bagaimana perubahan kondisi pasar mempengaruhi harga dan kuantitas keseimbangan.</p>
+
+    <div class="simulator fade-in">
+      <h3>🎛 Simulasi Pasar Interaktif</h3>
+      <p class="simulator-desc">Ubah faktor-faktor di bawah ini dan amati perubahan pada keseimbangan pasar secara real-time.</p>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>📈 Kekuatan Permintaan</span>
+          <span class="slider-value" id="demandVal">50</span>
+        </div>
+        <input type="range" min="10" max="100" value="50" id="demandSlider" oninput="updateSim()">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🏭 Kekuatan Penawaran</span>
+          <span class="slider-value" id="supplyVal">50</span>
+        </div>
+        <input type="range" min="10" max="100" value="50" id="supplySlider" oninput="updateSim()">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔧 Efisiensi Teknologi (%)</span>
+          <span class="slider-value" id="techVal">50</span>
+        </div>
+        <input type="range" min="0" max="100" value="50" id="techSlider" oninput="updateSim()">
+      </div>
+
+      <div class="sim-result">
+        <div class="sim-metric">
+          <label>Harga Keseimbangan</label>
+          <span id="eqPrice">Rp 10.000</span>
+        </div>
+        <div class="sim-metric">
+          <label>Kuantitas (unit)</label>
+          <span id="eqQty">500</span>
+        </div>
+        <div class="sim-metric">
+          <label>Kondisi Pasar</label>
+          <span id="eqStatus" style="font-size:0.9rem;">⚖️ Seimbang</span>
+        </div>
+      </div>
+
+      <div id="simMessage" style="margin-top:1rem;padding:1rem;border-radius:8px;background:rgba(245,200,66,0.06);border:1px solid rgba(245,200,66,0.15);color:var(--muted);font-size:0.9rem;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- KUIS -->
+<section id="kuis" class="quiz-section">
+  <div class="container">
+    <div class="section-label">Uji Pemahaman</div>
+    <h2 class="section-title" style="margin-bottom:2rem;">Kuis <em style="font-style:italic;color:var(--accent)">Interaktif</em></h2>
+
+    <div class="quiz-wrapper">
+      <div class="quiz-header">
+        <h2>📝 Kuis Penawaran & Permintaan</h2>
+        <div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;text-align:right;" id="progressText">Soal 1 dari 10</div>
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="progressFill" style="width:10%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="quizBody" class="quiz-body">
+        <div class="question-num" id="qNum">SOAL 01 / 10</div>
+        <div class="question-text" id="qText"></div>
+        <div class="options" id="qOptions"></div>
+        <div class="quiz-feedback" id="qFeedback"></div>
+        <div class="quiz-nav">
+          <div class="quiz-score">Skor: <span id="scoreDisplay">0</span> / <span id="totalDisplay">0</span></div>
+          <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none;">Soal Berikutnya →</button>
+        </div>
+      </div>
+
+      <div class="result-screen" id="resultScreen">
+        <div class="result-emoji" id="resultEmoji">🎉</div>
+        <div class="result-score-big" id="resultScore">0</div>
+        <div style="font-size:1.2rem;color:var(--muted);margin-bottom:0.5rem;">dari 10 soal benar</div>
+        <div class="result-label" id="resultLabel"></div>
+        <div class="result-breakdown">
+          <div class="res-stat">
+            <span class="val val-correct" id="resCorrect">0</span>
+            <span class="lbl">✅ Benar</span>
+          </div>
+          <div class="res-stat">
+            <span class="val val-wrong" id="resWrong">0</span>
+            <span class="lbl">❌ Salah</span>
+          </div>
+          <div class="res-stat">
+            <span class="val" style="color:var(--accent)" id="resPct">0%</span>
+            <span class="lbl">📊 Persentase</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="restartQuiz()" style="margin-top:1rem;">🔁 Ulangi Kuis</button>
+        <a href="#pengantar" class="btn-outline" style="margin-left:1rem;margin-top:1rem;">📚 Pelajari Lagi</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Dibuat untuk pembelajaran ekonomi dasar · <strong>Penawaran & Permintaan</strong></p>
+  <p style="margin-top:0.5rem;font-size:0.75rem;">Eko·Dasar — Memahami ekonomi dengan cara yang menyenangkan</p>
+</footer>
+
+<script>
+// ---- FADE IN ON SCROLL ----
+const fadeEls = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.1 });
+fadeEls.forEach(el => observer.observe(el));
+
+// ---- SIMULATOR ----
+function updateSim() {
+  const d = parseInt(document.getElementById('demandSlider').value);
+  const s = parseInt(document.getElementById('supplySlider').value);
+  const t = parseInt(document.getElementById('techSlider').value);
+
+  document.getElementById('demandVal').textContent = d;
+  document.getElementById('supplyVal').textContent = s;
+  document.getElementById('techVal').textContent = t;
+
+  // Simple equilibrium model
+  const basePrice = 10000;
+  const techEffect = (t - 50) * 20; // tech reduces supply cost
+  const price = Math.round((basePrice + (d - s) * 100 - techEffect) / 100) * 100;
+  const qty = Math.round((d + s) / 2 * 10 + t * 2);
+
+  const clampedPrice = Math.max(2000, Math.min(25000, price));
+  document.getElementById('eqPrice').textContent = 'Rp ' + clampedPrice.toLocaleString('id-ID');
+  document.getElementById('eqQty').textContent = qty.toLocaleString('id-ID');
+
+  let status, msg;
+  if (d > s + 20) {
+    status = '🔴 Shortage';
+    msg = '⚠️ Permintaan jauh melebihi penawaran. Terjadi kelangkaan barang di pasar. Harga cenderung naik hingga mencapai keseimbangan baru.';
+  } else if (s > d + 20) {
+    status = '🔵 Surplus';
+    msg = '📦 Penawaran jauh melebihi permintaan. Terjadi kelebihan stok di pasar. Produsen akan menurunkan harga untuk menarik pembeli.';
+  } else {
+    status = '⚖️ Seimbang';
+    msg = '✅ Pasar dalam kondisi seimbang! Jumlah yang diminta setara dengan jumlah yang ditawarkan. Harga stabil.';
+  }
+
+  if (t > 70) msg += ' Teknologi tinggi membantu produsen menekan biaya, meningkatkan efisiensi pasar.';
+
+  document.getElementById('eqStatus').textContent = status;
+  document.getElementById('simMessage').textContent = msg;
+}
+updateSim();
+
+// ---- QUIZ ----
+const questions = [
+  {
+    q: "Hukum permintaan menyatakan bahwa jika harga suatu barang naik, maka...",
+    opts: ["Jumlah yang diminta naik", "Jumlah yang diminta turun", "Jumlah yang ditawarkan turun", "Jumlah yang ditawarkan naik"],
+    ans: 1,
+    fb: "Benar! Hukum permintaan menunjukkan hubungan terbalik antara harga dan jumlah yang diminta. Semakin mahal harganya, semakin sedikit orang yang mau membeli (ceteris paribus)."
+  },
+  {
+    q: "Kurva permintaan memiliki kemiringan ke arah mana?",
+    opts: ["Ke atas kanan (positif)", "Ke bawah kanan (negatif)", "Horizontal (datar)", "Vertikal (tegak)"],
+    ans: 1,
+    fb: "Tepat! Kurva permintaan miring ke bawah dari kiri ke kanan (negatif), mencerminkan hubungan terbalik antara harga dan kuantitas yang diminta."
+  },
+  {
+    q: "Hukum penawaran menyatakan bahwa jika harga naik, maka...",
+    opts: ["Jumlah yang ditawarkan turun", "Jumlah yang ditawarkan naik", "Jumlah yang diminta naik", "Jumlah yang diminta turun"],
+    ans: 1,
+    fb: "Benar! Hukum penawaran menunjukkan hubungan searah antara harga dan jumlah yang ditawarkan. Harga tinggi memberi insentif bagi produsen untuk memproduksi lebih banyak."
+  },
+  {
+    q: "Apa yang dimaksud dengan harga keseimbangan (equilibrium price)?",
+    opts: ["Harga terendah yang ditetapkan pemerintah", "Harga di mana jumlah yang diminta = jumlah yang ditawarkan", "Harga rata-rata di semua pasar", "Harga tertinggi yang diinginkan konsumen"],
+    ans: 1,
+    fb: "Tepat! Harga keseimbangan adalah harga di mana jumlah yang diminta (Qd) sama dengan jumlah yang ditawarkan (Qs), sehingga pasar dalam kondisi stabil."
+  },
+  {
+    q: "Pendapatan konsumen meningkat secara signifikan. Apa yang terjadi pada kurva permintaan barang normal?",
+    opts: ["Bergeser ke kiri (turun)", "Bergeser ke kanan (naik)", "Tidak berubah sama sekali", "Menjadi lebih curam"],
+    ans: 1,
+    fb: "Benar! Kenaikan pendapatan membuat konsumen mampu membeli lebih banyak barang normal pada setiap tingkat harga, sehingga kurva permintaan bergeser ke kanan."
+  },
+  {
+    q: "Surplus di pasar terjadi ketika...",
+    opts: ["Harga berada di bawah harga keseimbangan", "Harga berada di atas harga keseimbangan", "Jumlah yang diminta melebihi penawaran", "Pasar dalam kondisi seimbang"],
+    ans: 1,
+    fb: "Tepat! Surplus (kelebihan) terjadi ketika harga di atas keseimbangan — produsen mau menjual banyak, tapi konsumen tidak mau membeli sebanyak itu. Stok menumpuk."
+  },
+  {
+    q: "Teknologi produksi yang lebih canggih dan efisien akan...",
+    opts: ["Menggeser kurva penawaran ke kiri", "Menggeser kurva permintaan ke kiri", "Menggeser kurva penawaran ke kanan", "Tidak mempengaruhi kurva apapun"],
+    ans: 2,
+    fb: "Benar! Kemajuan teknologi menurunkan biaya produksi, sehingga produsen bersedia menawarkan lebih banyak barang pada setiap tingkat harga — kurva penawaran bergeser ke kanan."
+  },
+  {
+    q: "Istilah 'ceteris paribus' dalam ilmu ekonomi berarti...",
+    opts: ["Harga selalu naik", "Faktor lain dianggap tetap/konstan", "Pasar selalu seimbang", "Semua konsumen rasional"],
+    ans: 1,
+    fb: "Tepat! 'Ceteris paribus' adalah frasa Latin yang berarti 'hal-hal lain dalam kondisi sama'. Ini digunakan agar kita bisa menganalisis pengaruh satu variabel tanpa gangguan faktor lain."
+  },
+  {
+    q: "Ketika harga kopi naik drastis, permintaan terhadap teh kemungkinan akan...",
+    opts: ["Turun, karena teh juga mahal", "Naik, karena teh adalah barang substitusi", "Tidak berubah sama sekali", "Turun, karena orang tidak suka teh"],
+    ans: 1,
+    fb: "Benar! Kopi dan teh adalah barang substitusi (pengganti). Ketika harga kopi naik, konsumen beralih ke teh sebagai alternatif yang lebih murah, sehingga permintaan teh meningkat."
+  },
+  {
+    q: "Shortage (kelangkaan) di pasar mendorong harga untuk...",
+    opts: ["Turun menuju keseimbangan", "Naik menuju keseimbangan", "Tetap tidak berubah", "Turun di bawah keseimbangan"],
+    ans: 1,
+    fb: "Benar! Shortage terjadi ketika permintaan melebihi penawaran. Konsumen bersaing mendapatkan barang langka, mendorong harga naik hingga pasar mencapai titik keseimbangan baru."
+  }
+];
+
+let current = 0, score = 0, answered = false;
+
+function loadQuestion() {
+  const q = questions[current];
+  document.getElementById('qNum').textContent = `SOAL ${String(current+1).padStart(2,'0')} / ${questions.length}`;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progressText').textContent = `Soal ${current+1} dari ${questions.length}`;
+  document.getElementById('progressFill').style.width = `${((current+1)/questions.length)*100}%`;
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('totalDisplay').textContent = current;
+  document.getElementById('nextBtn').style.display = 'none';
+  document.getElementById('qFeedback').className = 'quiz-feedback';
+  document.getElementById('qFeedback').textContent = '';
+  answered = false;
+
+  const letters = ['A','B','C','D'];
+  const optsHtml = q.opts.map((opt, i) => `
+    <button class="option-btn" onclick="selectOption(${i})" id="opt${i}">
+      <span class="opt-letter">${letters[i]}</span>
+      ${opt}
+    </button>
+  `).join('');
+  document.getElementById('qOptions').innerHTML = optsHtml;
+}
+
+function selectOption(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.option-btn');
+
+  btns.forEach((btn, i) => {
+    if (i === q.ans) btn.classList.add('correct');
+    else if (i === idx && idx !== q.ans) btn.classList.add('wrong');
+    else btn.classList.add('disabled');
+  });
+
+  const fb = document.getElementById('qFeedback');
+  if (idx === q.ans) {
+    score++;
+    fb.className = 'quiz-feedback show';
+    fb.innerHTML = `✅ <strong>Benar!</strong> ${q.fb}`;
+  } else {
+    fb.className = 'quiz-feedback show wrong-fb';
+    fb.innerHTML = `❌ <strong>Salah.</strong> ${q.fb}`;
+  }
+
+  document.getElementById('scoreDisplay').textContent = score;
+  document.getElementById('totalDisplay').textContent = current + 1;
+  document.getElementById('nextBtn').style.display = 'inline-block';
+  document.getElementById('nextBtn').textContent = current < questions.length - 1 ? 'Soal Berikutnya →' : 'Lihat Hasil 🏆';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < questions.length) {
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById('quizBody').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+
+  const pct = Math.round((score / questions.length) * 100);
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resCorrect').textContent = score;
+  document.getElementById('resWrong').textContent = questions.length - score;
+  document.getElementById('resPct').textContent = pct + '%';
+
+  let emoji, label;
+  if (pct === 100) { emoji = '🏆'; label = 'Sempurna! Kamu benar-benar menguasai materi permintaan & penawaran!'; }
+  else if (pct >= 80) { emoji = '🎉'; label = 'Luar biasa! Pemahaman kamu sangat baik. Terus pertahankan!'; }
+  else if (pct >= 60) { emoji = '👍'; label = 'Bagus! Tapi masih ada ruang untuk berkembang. Coba pelajari ulang materinya.'; }
+  else if (pct >= 40) { emoji = '📚'; label = 'Cukup baik sebagai permulaan. Yuk pelajari lagi materinya lebih teliti!'; }
+  else { emoji = '💪'; label = 'Jangan menyerah! Baca materinya lagi dan coba kuis ini sekali lagi.'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultLabel').textContent = label;
+}
+
+function restartQuiz() {
+  current = 0; score = 0; answered = false;
+  document.getElementById('quizBody').style.display = 'block';
+  document.getElementById('resultScreen').classList.remove('show');
+  loadQuestion();
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
